@@ -1,0 +1,12 @@
+{% extends "base.html" %} {% block title %}{% if object %}Редактировать материал{% else %}Создать материал{% endif %}{% endblock %} {% block content %}
+<h1>
+	{% if object %}Редактировать{% else %}Создать{% endif %} {{ model_name }}
+</h1>
+<form method="post" enctype="multipart/form-data">
+	{% csrf_token %} {{ form.as_p }}
+	<p>
+		<button type="submit">Сохранить</button>
+		<a href="{% url 'courses:module_content_list' module.id %}">Отмена</a>
+	</p>
+</form>
+{% endblock %}

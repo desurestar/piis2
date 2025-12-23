@@ -1,0 +1,42 @@
+{% extends "base.html" %} {% block title %}{{ course.title }}{% endblock %} {% block content %}
+<h1>{{ course.title }}</h1>
+<p>
+	<em>Предмет:</em> {{ course.subject.title }} | <em>Автор:</em> {{
+	course.owner.username }}
+</p>
+<p>{{ course.overview }}</p>
+
+{# форма записи на курс #} {% if enroll_form %}
+<form method="post" action="{% url 'students:student_enroll_course' %}">
+	{% csrf_token %} {{ enroll_form }}
+	<p><button type="submit" class="button">Записаться на курс</button></p>
+</form>
+{% else %} {% if not user.is_authenticated %}
+<p>
+	<a href="{% url 'login' %}?next={{ request.path }}"
+		>Войдите, чтобы записаться на курс</a
+	>
+</p>
+{% endif %} {% endif %}
+
+<h2>Модули</h2>
+<ol class="modules">
+	{% for module in course.modules.all %}
+	<li>
+		<strong>{{ module.title }}</strong>
+		<p>{{ module.description }}</p>
+		{% if module.contents.all %}
+		<ul>
+			{% for content in module.contents.all %}
+			<li>{{ content.content_type.model }}: {{ content.item.title }}</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+		<p>Нет материалов</p>
+		{% endif %}
+	</li>
+	{% empty %}
+	<li>Модулей пока нет.</li>
+	{% endfor %}
+</ol>
+{% endblock %}

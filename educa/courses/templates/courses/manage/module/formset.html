@@ -1,0 +1,24 @@
+{% extends "base.html" %} {% block title %}Модули курса{% endblock %} {% block content %}
+<h1>Модули курса: {{ course.title }}</h1>
+<form method="post">
+	{% csrf_token %} {{ formset.management_form }}
+	<table>
+		{% for form in formset %}
+		<tr>
+			<td>{{ form.as_p }}</td>
+			<td>
+				{% if form.instance.pk %}
+				<a href="{% url 'courses:module_content_list' form.instance.id %}"
+					>Материалы</a
+				>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	<p>
+		<button type="submit">Сохранить</button>
+		<a href="{% url 'courses:manage_course_list' %}">Назад</a>
+	</p>
+</form>
+{% endblock %}

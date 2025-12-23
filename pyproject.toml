@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "laba4"
+version = "0.1.0"
+description = "Лабораторная работа по Django"
+authors = [
+    { name = "Твое имя", email = "you@example.com" }
+]
+dependencies = [
+    # --- Основные ---
+    "pymemcache==4.0.0",
+    "Django>=5.0.4",
+    "djangorestframework>=3.15.2",
+    "redis==5.0.4",
+    "django-redis",
+    "Pillow>=11.0.0",          # работа с изображениями
+    # --- Форматирование и линтинг ---
+    "black>=23.3.0",           # форматирование кода
+    "isort>=5.12.0",           # сортировка импортов
+    "ruff>=0.0.380",           # линтер и автоисправления
+
+    # --- Тестирование ---
+    "django-debug-toolbar==4.3.0",
+    "pytest>=8.2.0",
+    "pytest-django>=4.5.2",
+    "pytest-cov>=4.1.0",       # отчёты по покрытию тестами
+    "factory-boy>=3.2.1",      # генерация тестовых данных
+
+    # --- Утилиты для разработки ---
+    "ipython>=8.15.0",         # интерактивная консоль
+    "django-extensions>=3.3.2",# полезные команды для Django
+    "debugpy>=1.6.7",          # отладка с VS Code
+
+    # --- Optional: Работа с API и документацией ---
+    "drf-spectacular>=0.28.0", # OpenAPI спецификация
+]
+
+[tool.ruff]
+line-length = 300
+fix = true
+ignore = ["W191"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "Q"]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+multiline-quotes = "single"
+docstring-quotes = "single"
+avoid-escape = true
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "educa.settings"

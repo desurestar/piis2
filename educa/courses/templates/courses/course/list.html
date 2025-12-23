@@ -1,0 +1,23 @@
+{% extends "base.html" %} {% block title %}Курсы{% endblock %} {% block content %}
+<h1>
+	{% if current_subject %} Курсы по предмету: {{ current_subject.title }} {%
+	else %} Все курсы {% endif %}
+</h1>
+<ul class="courses">
+	{% for course in courses %}
+	<li>
+		<a href="{% url 'courses:course_detail' course.slug %}"
+			>{{ course.title }}</a
+		>
+		<br />
+		<small
+			>Предмет: {{ course.subject.title }} | Автор: {{ course.owner.username }}
+			| {{ course.created|date:"d.m.Y" }}</small
+		>
+		<p>{{ course.overview|truncatewords:25 }}</p>
+	</li>
+	{% empty %}
+	<li>Курсов пока нет.</li>
+	{% endfor %}
+</ul>
+{% endblock %}

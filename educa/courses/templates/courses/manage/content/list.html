@@ -1,0 +1,40 @@
+{% extends "base.html" %} {% block title %}Материалы модуля{% endblock %} {% block content %}
+<h1>Материалы: {{ module.title }}</h1>
+<p>
+	<a href="{% url 'courses:content_create' module.id 'text' %}">+ Текст</a> ·
+	<a href="{% url 'courses:content_create' module.id 'image' %}"
+		>+ Изображение</a
+	>
+	· <a href="{% url 'courses:content_create' module.id 'file' %}">+ Файл</a> ·
+	<a href="{% url 'courses:content_create' module.id 'video' %}">+ Видео</a>
+</p>
+<ul>
+	{% for content in module.contents.all %}
+	<li>
+		<strong>{{ content.item.title }}</strong>
+		<small>({{ content.content_type.model }})</small>
+		<div>
+			<a
+				href="{% url 'courses:content_update' module.id content.content_type.model content.item.id %}"
+				>Редактировать</a
+			>
+			<form
+				action="{% url 'courses:content_delete' content.id %}"
+				method="post"
+				style="display: inline"
+			>
+				{% csrf_token %}
+				<button type="submit" class="linklike">Удалить</button>
+			</form>
+		</div>
+	</li>
+	{% empty %}
+	<li>Нет материалов.</li>
+	{% endfor %}
+</ul>
+<p>
+	<a href="{% url 'courses:course_module_update' module.course.id %}"
+		>Назад к модулям</a
+	>
+</p>
+{% endblock %}
