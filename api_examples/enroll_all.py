@@ -1,7 +1,7 @@
 import requests
 
-username = ''
-password = ''
+username = 'your_username'
+password = 'your_password'
 base_url = 'http://127.0.0.1:8000/api/'
 url = f'{base_url}courses/'
 available_courses = []
@@ -27,3 +27,5 @@ for course in all_courses:
     )
     if r.status_code == 200:
         print(f'Successfully enrolled in {course_title}')
+    else:
+        print(f'Failed to enroll in {course_title}: {r.status_code} {r.text}')

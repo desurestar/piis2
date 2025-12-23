@@ -23,7 +23,9 @@ class SubjectViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = StandardPagination
 
 class CourseViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Course.objects.prefetch_related('modules')
+    queryset = Course.objects.select_related('subject', 'owner').prefetch_related(
+        'modules', 'modules__contents'
+    )
     serializer_class = CourseSerializer
 
     @decorators.action(
@@ -34,8 +36,11 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def enroll(self, request, *args, **kwargs):
         course = self.get_object()
-        course.students.add(request.user)
-        return Response({'enrolled': True})
+        _, created = course.students.through.objects.get_or_create(
+            course=course,
+            user=request.user,
+        )
+        return Response({'enrolled': True, 'new_enrollment': created})
 
     @decorators.action(
         detail=True,

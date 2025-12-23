@@ -48,7 +48,7 @@ class CourseAPITestCase(TestCase):
         response = self.client.get(contents_url)
         self.assertEqual(response.status_code, 401)
 
-        student = User.objects.create_user(username='student2', password='pass')
+        student = User.objects.create_user(username='student_contents', password='pass')
         self.client.force_authenticate(user=student)
         unauthorized_response = self.client.get(contents_url)
         self.assertEqual(unauthorized_response.status_code, 403)
