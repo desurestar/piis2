@@ -42,3 +42,18 @@ class CourseAPITestCase(TestCase):
         self.assertEqual(authed_response.status_code, 200)
         self.assertTrue(authed_response.data.get('enrolled'))
         self.assertTrue(self.course.students.filter(id=student.id).exists())
+
+    def test_course_contents_requires_enrollment(self):
+        contents_url = f'/api/courses/{self.course.id}/contents/'
+        response = self.client.get(contents_url)
+        self.assertEqual(response.status_code, 401)
+
+        student = User.objects.create_user(username='student2', password='pass')
+        self.client.force_authenticate(user=student)
+        unauthorized_response = self.client.get(contents_url)
+        self.assertEqual(unauthorized_response.status_code, 403)
+
+        self.course.students.add(student)
+        authorized_response = self.client.get(contents_url)
+        self.assertEqual(authorized_response.status_code, 200)
+        self.assertEqual(authorized_response.data.get('id'), self.course.id)

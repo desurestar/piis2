@@ -1,5 +1,5 @@
-from rest_framework import decorators, generics, viewsets
-from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+from rest_framework import decorators, viewsets
+from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -9,6 +9,7 @@ from .serializers import (
     CourseWithContentsSerializer,
     SubjectSerializer,
 )
+from .permissions import IsEnrolled
 
 from django.db.models import Count
 from .pagination import StandardPagination
@@ -21,28 +22,27 @@ class SubjectViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SubjectSerializer
     pagination_class = StandardPagination
 
-class CourseEnrollView(generics.GenericAPIView):
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
-    authentication_classes = [BasicAuthentication, SessionAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, *args, **kwargs):
-        course = self.get_object()
-        _, created = course.students.through.objects.get_or_create(
-            course=course,
-            user=request.user,
-        )
-        return Response({'enrolled': True, 'new_enrollment': created})
-
-
-
 class CourseViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Course.objects.all()
+    queryset = Course.objects.prefetch_related('modules')
     serializer_class = CourseSerializer
 
-    @decorators.action(detail=True, methods=['get'])
-    def contents(self, request, *args, **kwargs):
+    @decorators.action(
+        detail=True,
+        methods=['post'],
+        authentication_classes=[BasicAuthentication],
+        permission_classes=[IsAuthenticated],
+    )
+    def enroll(self, request, *args, **kwargs):
         course = self.get_object()
-        serializer = CourseWithContentsSerializer(course)
-        return Response(serializer.data)
+        course.students.add(request.user)
+        return Response({'enrolled': True})
+
+    @decorators.action(
+        detail=True,
+        methods=['get'],
+        serializer_class=CourseWithContentsSerializer,
+        authentication_classes=[BasicAuthentication],
+        permission_classes=[IsAuthenticated, IsEnrolled],
+    )
+    def contents(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
